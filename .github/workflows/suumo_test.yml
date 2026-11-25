@@ -1,0 +1,17 @@
+name: suumo-reach-test
+on: workflow_dispatch
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: SUUMO reachability
+        run: |
+          UA="Mozilla/5.0 (Windows NT 10.0; Win64; x64) insta_auto/0.1 (keyaki-jyuken internal use)"
+          L="https://suumo.jp/ikkodate/__JJ_JJ010FJ001_arz1050z2bsz1020z2kkcz1160475002z2kkcz1160475003z2kkcz1160475004z2kkcz1160475005.html"
+          D="https://suumo.jp/ikkodate/aichi/sc_nishio/nc_22154301/"
+          for U in "$L" "$D"; do
+            curl -s -o out.html -w "HTTP %{http_code} size %{size_download}\n" -A "$UA" --max-time 30 "$U"
+            echo "contains nc_ links: $(grep -o 'nc_[0-9]*' out.html | sort -u | wc -l)"
+            echo "contains 物件概要: $(grep -c '物件概要' out.html)"
+            sleep 6
+          done
